@@ -21,6 +21,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'is_active'
     ];
 
     /**
@@ -44,5 +46,38 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function isAdmin(){
+        return $this -> role === 'admin';
+    }
+
+    public function isUser(){
+        return $this-> role === 'user';
+    }
+
+    public function goals()
+    {
+        return $this->hasMany(Goal::class);
+    }
+
+    public function timeRecords()
+    {
+        return $this->hasMany(TimeRecord::class);
+    }
+
+    public function activityLogs()
+    {
+        return $this->hasMany(ActivityLog::class);
+    }
+
+    public function activeGoal()
+    {
+        return $this->hasOne(Goal::class)->where('status', 'active')->latest();
+    }
+
+    public function totalHoursLogged()
+    {
+        return $this->timeRecords()->sum('total_hours');
     }
 }
