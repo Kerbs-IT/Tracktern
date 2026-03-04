@@ -1,4 +1,4 @@
-FROM php:8.2-apache
+FROM php:8.3-apache
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -30,8 +30,8 @@ WORKDIR /var/www/html
 # Copy existing application directory contents
 COPY . /var/www/html
 
-# Install Composer dependencies
-RUN composer install --optimize-autoloader --no-dev
+# Install Composer dependencies (ignore platform requirements)
+RUN composer install --optimize-autoloader --no-dev --ignore-platform-reqs
 
 # Install NPM dependencies and build Vite assets
 RUN npm install
