@@ -22,7 +22,7 @@ class ActivityLog extends Model
     public static function log($action, $details = null)
     {
         return self::create([
-            'user_id' => auth()->id,
+            'user_id' => auth()->id(),
             'action' => $action,
             'details' => $details,
             'ip_address' => request()->ip(),
