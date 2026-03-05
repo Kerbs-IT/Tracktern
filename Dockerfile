@@ -38,6 +38,9 @@ RUN composer install --optimize-autoloader --no-dev --ignore-platform-reqs
 RUN npm install
 RUN npm run build
 
+# Create symbolic link for storage (if needed)
+RUN php artisan storage:link || true
+
 # Configure Apache DocumentRoot to point to Laravel's public directory
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
@@ -45,11 +48,13 @@ RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
 
 # Set proper permissions
 RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html/storage \
-    && chmod -R 755 /var/www/html/bootstrap/cache
+    && chmod -R 775 /var/www/html/storage \
+    && chmod -R 775 /var/www/html/bootstrap/cache
 
 # Create startup script that runs migrations then starts Apache
 RUN echo '#!/bin/bash\n\
+chmod -R 775 /var/www/html/storage\n\
+chmod -R 775 /var/www/html/bootstrap/cache\n\
 php artisan migrate --force\n\
 php artisan db:seed --class=AdminSeeder --force || true\n\
 apache2-foreground' > /usr/local/bin/start.sh \
